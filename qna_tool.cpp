@@ -259,7 +259,7 @@ Node* QNA_tool::get_top_k_para(string question, int k) {
         double fsc = 0;
         for (int j = 0; j < e.size(); j++)
         {
-            fsc += e[i]
+            //
         }
         
     }
