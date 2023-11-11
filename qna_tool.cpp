@@ -170,10 +170,11 @@ vector<QNA_tool::paragraph_details> QNA_tool::score_paragraphs(vector<pair<strin
         vector<paragraph_details> result;
 
         for (int i = 1; i<library.size(); i++) {
-            for (int j = 1; j<library[i].size; j++) {
+            for (int j = 1; j<=library[i].size; j++) {
                 for (int k = 1; k<library[i].books[j].size(); k++) {
                     
                     Dict dictionary = library[i].books[j][k].dictionary;
+
                     paragraph_details para;
                     para.book_no = i;
                     para.page_no = j;
@@ -186,6 +187,8 @@ vector<QNA_tool::paragraph_details> QNA_tool::score_paragraphs(vector<pair<strin
                         para.score += count * query_words[l].second;
 
                     }
+
+                    result.push_back(para);
                     
                 }
             }
@@ -343,21 +346,21 @@ int main()
     a.insert_sentence(1, 1, 1, 3, "the,");
     a.insert_sentence(1, 1, 1, 4, "the.");
     a.insert_sentence(1, 1, 1, 5, "the!");
-    a.insert_sentence(1, 1, 1, 6, "the-");
-    a.insert_sentence(1, 1, 1, 7, "the:");
-    a.insert_sentence(1, 1, 1, 8, "the;");
-    a.insert_sentence(1, 1, 1, 9, "the[");
-    a.insert_sentence(1, 1, 1, 10, "the]");
-    a.insert_sentence(1, 1, 1, 11, "fuck(");
-    a.insert_sentence(1, 1, 1, 12, "fuck)");
-    a.insert_sentence(1, 1, 1, 13, "fuck");
-    a.insert_sentence(1, 1, 1, 14, "fuck");
-    a.insert_sentence(1, 1, 1, 15, "fuck@");
-    a.insert_sentence(1, 1, 1, 16, "is");
-    a.insert_sentence(1, 1, 1, 17, "is");
-    a.insert_sentence(1, 1, 1, 18, "is");
-    a.insert_sentence(1, 1, 1, 19, "is");
-    a.insert_sentence(1, 1, 1, 20, "is");
+    a.insert_sentence(1, 1, 2, 1, "the-");
+    a.insert_sentence(1, 1, 2, 2, "the:");
+    a.insert_sentence(1, 1, 2, 3, "the;");
+    a.insert_sentence(1, 1, 2, 4, "the[");
+    a.insert_sentence(1, 1, 2, 5, "the]");
+    a.insert_sentence(1, 1, 3, 1, "fuck(");
+    a.insert_sentence(1, 1, 3, 2, "fuck)");
+    a.insert_sentence(1, 1, 3, 3, "fuck");
+    a.insert_sentence(1, 1, 3, 4, "fuck");
+    a.insert_sentence(1, 1, 3, 5, "fuck@");
+    a.insert_sentence(1, 1, 4, 6, "is");
+    a.insert_sentence(1, 1, 4, 7, "is");
+    a.insert_sentence(1, 1, 4, 8, "is");
+    a.insert_sentence(1, 1, 4, 9, "is");
+    a.insert_sentence(1, 1, 4, 0, "is");
 
     string q = "the fuck is your name?";
 
@@ -366,5 +369,13 @@ int main()
     {
         cout << ww[i].first << " " << ww[i].second << endl;
     }
+
+    auto pp = a.score_paragraphs(ww);
+    for (auto p : pp)
+    {
+        cout << p.book_no << " " << p.page_no << " " << p.para_no << " " << p.score << endl;
+    }
+
     cout << "done" << endl;
+
 }
