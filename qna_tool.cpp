@@ -64,10 +64,11 @@ void QNA_tool::insert_sentence(int book_code, int page_no, int paragraph, int se
             new_pages[i] = library[book_code].books[i];
         }
 
+
         delete[] library[book_code].books;
         library[book_code].books = new_pages;
-        library[book_code].size = 2 * page_no;
         library[book_code].capacity = 2 * page_no;
+        library[book_code].size = max(library[book_code].size, page_no);
     }
 
 
@@ -77,7 +78,6 @@ void QNA_tool::insert_sentence(int book_code, int page_no, int paragraph, int se
     }
 
     library[book_code].books[page_no][paragraph].dictionary.insert_sentence(book_code, page_no, paragraph, sentence_no, sentence);
-    library[book_code].size++;
 
     return;
 }
@@ -138,12 +138,12 @@ vector<pair<string, double>> QNA_tool::score_words(string question) {
         }
     }
 
+    for (pair<string, int> i : result) {
+        cout << i.first << " " << i.second << endl;
+    }
+
     int find_count = 0;
     ifstream frequency_file("unigram_freq.csv");
-    
-    //result[0].second = 81984619;
-
-
     
     for (int i = 0; i < result.size(); i++)
     {
@@ -157,19 +157,20 @@ vector<pair<string, double>> QNA_tool::score_words(string question) {
             getline(frequency_file,countofword);
 
             if (word1 == result[i].first)
-            {
-                //cout << result[i].second << endl;
-                
+            {                
                 double c = (result[i].second)/(double)(stod(countofword));
                 
                 result[i].second = c;
                 cout << result[i].first << " " <<  result[i].second << endl;
+
+                result[i].second = 3135468;
+
                 break;
-            }
-            
+            }   
         }
-        
     }
+
+    return result;
 }
 
 Node *QNA_tool::get_top_k_para(string question, int k)
@@ -316,6 +317,7 @@ int main()
 {
     QNA_tool a;
     a.insert_sentence(1, 1, 1, 1, "the ");
+
     a.insert_sentence(1, 1, 1, 2, "the?");
     a.insert_sentence(1, 1, 1, 3, "the,");
 
@@ -327,6 +329,16 @@ int main()
         cout << ww[i].first << " " << ww[i].second << endl;
     }
     
+
+
+    a.insert_sentence(1, 1, 1, 2, "the, ");
+    a.insert_sentence(1, 1, 1, 3, "the!");
+
+    vector<pair<string, double>> result = a.score_words("the fuck is your name ?");
+
+    for (pair<string, int> i : result) {
+        cout << i.first << " " << i.second << endl;
+    }
 
 
     cout << "done" << endl;
