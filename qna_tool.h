@@ -90,4 +90,8 @@ public:
 
     vector<paragraph_details> score_paragraphs(vector<pair<string, double>>);
 
+    void heapify(vector<paragraph_details>& arr, int n, int i);
+
+    void heapSort(vector<paragraph_details>& arr, int k);
+
 };

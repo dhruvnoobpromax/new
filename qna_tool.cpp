@@ -198,10 +198,77 @@ vector<QNA_tool::paragraph_details> QNA_tool::score_paragraphs(vector<pair<strin
 
 }
 
+void QNA_tool::heapify(vector<QNA_tool::paragraph_details>& arr, int n, int i) {
+    
+    int largest = i; // Initialize the root as the largest
+    int left = 2 * i + 1; // Index of the left child
+    int right = 2 * i + 2; // Index of the right child
+
+    // If the left child is smaller than the root
+    if (left < n && arr[left].score > arr[largest].score)
+        largest = left;
+
+    // If the right child is smaller than the current largest
+    if (right < n && arr[right].score > arr[largest].score)
+        largest = right;
+
+    // If the largest is not the root, swap and recursively heapify the affected sub-tree
+    if (largest != i) {
+        std::swap(arr[i], arr[largest]);
+        heapify(arr, n, largest);
+    }
+}
+
+void QNA_tool::heapSort(vector<QNA_tool::paragraph_details>& arr, int k) {
+    
+    int n = arr.size();
+
+    // Build max heap
+    for (int i = n / 2 - 1; i >= 0; i--)
+        heapify(arr, n, i);
+
+    // Extract elements from the heap one by one
+    for (int i = n - 1; i >= n-k-1; i--) {
+        // Swap the root (maximum element) with the last element
+        std::swap(arr[0], arr[i]);
+
+        // Call max heapify on the reduced heap
+        heapify(arr, i, 0);
+    }
+}
+
 Node *QNA_tool::get_top_k_para(string question, int k)
 {
 
-    return nullptr;
+    vector<paragraph_details> scored_paragraphs = score_paragraphs(score_words(question));
+
+    heapSort(scored_paragraphs, k);
+
+    Node *root = new Node;
+    root->right = nullptr;
+    root->left = nullptr;
+
+    Node* temp = root;
+
+    while(temp->right != nullptr) {
+        temp = temp->right;
+    }
+
+    int n = scored_paragraphs.size();
+    for (int i = n-k-1; i < n; i++) {
+
+        Node* newnode = new Node;
+        newnode->left = temp;
+        newnode->right = nullptr;
+        newnode->book_code = scored_paragraphs[i].book_no;
+        newnode->page = scored_paragraphs[i].page_no;
+        newnode->paragraph = scored_paragraphs[i].para_no;
+        newnode->sentence_no = -1;
+        temp->right = newnode;
+
+    }
+
+    return root;
 }
 
 void QNA_tool::query(string question, string filename)
@@ -361,19 +428,29 @@ int main()
     a.insert_sentence(1, 1, 4, 8, "is");
     a.insert_sentence(1, 1, 4, 9, "is");
     a.insert_sentence(1, 1, 4, 0, "is");
+    a.insert_sentence(1, 1, 5, 1, "this");
 
-    string q = "the fuck is your name?";
+    // string q = "the fuck is your name?";
 
-    auto ww = a.score_words(q);
-    for (int i = 0; i < ww.size(); i++)
-    {
-        cout << ww[i].first << " " << ww[i].second << endl;
-    }
+    // auto ww = a.score_words(q);
+    // for (int i = 0; i < ww.size(); i++)
+    // {
+    //     cout << ww[i].first << " " << ww[i].second << endl;
+    // }
 
-    auto pp = a.score_paragraphs(ww);
-    for (auto p : pp)
-    {
-        cout << p.book_no << " " << p.page_no << " " << p.para_no << " " << p.score << endl;
+    // auto pp = a.score_paragraphs(ww);
+    // for (auto p : pp)
+    // {
+    //     cout << p.book_no << " " << p.page_no << " " << p.para_no << " " << p.score << endl;
+    // }
+
+    Node* list = a.get_top_k_para("the fuck", 2);
+
+    Node* temp = list;
+
+    while (temp->right != nullptr) {
+        cout << temp->book_code << " " << temp->page << " " << temp->paragraph << endl;
+        temp = temp->right;
     }
 
     cout << "done" << endl;
