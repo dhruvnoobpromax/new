@@ -85,8 +85,9 @@ public:
         int book_no;
         int page_no;
         int para_no;
+        double score;
     };
-    
-    vector<paragraph_details> score_paragraphs(vector<pair<string, double>> );
+
+    vector<paragraph_details> score_paragraphs(vector<pair<string, double>>);
 
 };

@@ -48,7 +48,7 @@ QNA_tool::~QNA_tool()
 void QNA_tool::insert_sentence(int book_code, int page_no, int paragraph, int sentence_no, string sentence)
 {
 
-    if (library.size() < book_code)
+    if (library.size() <= book_code)
     {
         library.resize(2 * book_code);
     }
@@ -71,7 +71,7 @@ void QNA_tool::insert_sentence(int book_code, int page_no, int paragraph, int se
 
     library[book_code].size = max(library[book_code].size, page_no);
 
-    if (library[book_code].books[page_no].size() < paragraph)
+    if (library[book_code].books[page_no].size() <= paragraph)
     {
         library[book_code].books[page_no].resize(2 * paragraph);
     }
@@ -170,21 +170,33 @@ vector<QNA_tool::paragraph_details> QNA_tool::score_paragraphs(vector<pair<strin
         vector<paragraph_details> result;
 
         for (int i = 1; i<library.size(); i++) {
-            for (int j = 1; j<=library[i].size; j++) {
+            for (int j = 1; j<library[i].size; j++) {
                 for (int k = 1; k<library[i].books[j].size(); k++) {
                     
                     Dict dictionary = library[i].books[j][k].dictionary;
+
+                    paragraph_details para;
+                    para.book_no = i;
+                    para.page_no = j;
+                    para.para_no = k;
                     
                     for (int l = 0; l<query_words.size(); l++) {
                         
+                        int count = dictionary.get_word_count(query_words[l].first);
+
+                        para.score += query_words[l].second * count;
+                        
                     }
-                    
+
+                    result.push_back(para);
                 }
             }
         }
+
+
         
         return result;
-    
+
 }
 
 Node *QNA_tool::get_top_k_para(string question, int k)
@@ -335,21 +347,26 @@ int main()
     a.insert_sentence(1, 1, 1, 3, "the,");
     a.insert_sentence(1, 1, 1, 4, "the.");
     a.insert_sentence(1, 1, 1, 5, "the!");
-    a.insert_sentence(1, 1, 1, 6, "the-");
-    a.insert_sentence(1, 1, 1, 7, "the:");
-    a.insert_sentence(1, 1, 1, 8, "the;");
-    a.insert_sentence(1, 1, 1, 9, "the[");
-    a.insert_sentence(1, 1, 1, 10, "the]");
-    a.insert_sentence(1, 1, 1, 11, "fuck(");
-    a.insert_sentence(1, 1, 1, 12, "fuck)");
-    a.insert_sentence(1, 1, 1, 13, "fuck");
-    a.insert_sentence(1, 1, 1, 14, "fuck");
-    a.insert_sentence(1, 1, 1, 15, "fuck@");
-    a.insert_sentence(1, 1, 1, 16, "is");
-    a.insert_sentence(1, 1, 1, 17, "is");
-    a.insert_sentence(1, 1, 1, 18, "is");
-    a.insert_sentence(1, 1, 1, 19, "is");
-    a.insert_sentence(1, 1, 1, 20, "is");
+    a.insert_sentence(1, 1, 2, 1, "fuck(");
+    a.insert_sentence(1, 1, 2, 2, "fuck)");
+    a.insert_sentence(1, 1, 2, 3, "fuck");
+    a.insert_sentence(1, 1, 2, 4, "fuck");
+    a.insert_sentence(1, 1, 2, 5, "fuck@");
+    a.insert_sentence(1, 1, 3, 1, "is");
+    a.insert_sentence(1, 1, 3, 2, "is");
+    a.insert_sentence(1, 1, 3, 3, "is");
+    a.insert_sentence(1, 1, 3, 4, "is");
+    a.insert_sentence(1, 1, 3, 5, "is");
+    a.insert_sentence(1, 2, 1, 1, "your");
+    a.insert_sentence(1, 2, 1, 2, "your");
+    a.insert_sentence(1, 2, 1, 3, "your");
+    a.insert_sentence(1, 2, 1, 4, "your");
+    a.insert_sentence(1, 2, 1, 5, "your");
+    a.insert_sentence(1, 3, 1, 1, "name");
+    a.insert_sentence(1, 3, 1, 2, "name");
+    a.insert_sentence(1, 3, 1, 3, "name");
+    a.insert_sentence(1, 3, 1, 4, "name");
+    a.insert_sentence(1, 3, 1, 5, "name");
 
     string q = "the fuck is your name?";
 
@@ -358,5 +375,6 @@ int main()
     {
         cout << ww[i].first << " " << ww[i].second << endl;
     }
+    
     cout << "done" << endl;
 }
