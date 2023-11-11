@@ -139,13 +139,35 @@ vector<pair<string, int>> QNA_tool::score_words(string question) {
     }
 
     int find_count = 0;
-    ifstream frequency_file("unigram.csv");
+    ifstream frequency_file("unigram_freq.csv");
+    
+    //result[0].second = 81984619;
 
-    while (find_count < result.size()) {
+
+    
+    for (int i = 0; i < result.size(); i++)
+    {
+        std::string word1;
+        std::string countofword;
+
+        getline(frequency_file,word1);
+
+        while (getline(frequency_file,word1,','))
+        {
+            getline(frequency_file,countofword);
+
+            if (word1 == result[i].first)
+            {
+                //cout << result[i].second << endl;
+                
+                double c = (result[i].second)/(double)(stod(countofword));
+                result[i].second = c;
+                break;
+            }
             
+        }
+        
     }
-
-    return result;
 }
 
 Node *QNA_tool::get_top_k_para(string question, int k)
@@ -257,7 +279,7 @@ void QNA_tool::query_llm(string filename, Node *root, int k, string API_KEY, str
         // delete the file if it exists
         remove(p_file.c_str());
         ofstream outfile(p_file);
-        string paragraph = get_paragraph(traverse->book_code, traverse->books, traverse->paragraph);
+        string paragraph = get_paragraph(traverse->book_code, traverse->page, traverse->paragraph);
         assert(paragraph != "$I$N$V$A$L$I$D$");
         outfile << paragraph;
         outfile.close();
