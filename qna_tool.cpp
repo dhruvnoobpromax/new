@@ -165,37 +165,37 @@ vector<pair<string, double>> QNA_tool::score_words(string question) {
     return result;
 }
 
-vector<QNA_tool::new_user_defined_enhanced_struct> QNA_tool::built_over_other_build_struct(vector<pair<string, double>> query_words) {
+vector<QNA_tool::paragraph_details> QNA_tool::score_paragraphs(vector<pair<string, double>> query_words) {
         
-        vector<new_user_defined_enhanced_struct> result;
+        vector<paragraph_details> result;
 
         for (int i = 1; i<library.size(); i++) {
             for (int j = 1; j<=library[i].size; j++) {
                 for (int k = 1; k<library[i].books[j].size(); k++) {
                     
                     Dict dictionary = library[i].books[j][k].dictionary;
-                    double score;
-                    
-                    for (int l = 0; l<query_words.size(); l++) 
-                    {
-                        int a = dictionary.get_word_count(query_words[l].first);
-                        double b = a*query_words[i].second;
-                        score += b;
+
+                    paragraph_details para;
+                    para.book_no = i;
+                    para.page_no = j;
+                    para.para_no = k;
+
+                    for (int l = 0; l<query_words.size(); l++) {
+                        
+                        int count = dictionary.get_word_count(query_words[l].first);
+
+                        para.score += count * query_words[l].second;
+
                     }
 
-                    new_user_defined_enhanced_struct tr;
-                    tr.book_no = i;
-                    tr.page_no = j;
-                    tr.para_no = k;
-                    tr.score = score;
-
-                    result.push_back(tr);
+                    result.push_back(para);
+                    
                 }
             }
         }
-        
+
         return result;
-    
+
 }
 
 Node *QNA_tool::get_top_k_para(string question, int k)
@@ -342,33 +342,40 @@ int main()
 {
     QNA_tool a;
     a.insert_sentence(1, 1, 1, 1, "the ");
-    a.insert_sentence(1, 1, 2, 1, "the?");
-    a.insert_sentence(1, 1, 3, 1, "the,");
-    a.insert_sentence(1, 1, 1, 2, "the.");
-    a.insert_sentence(1, 1, 2, 2, "the!");
-    a.insert_sentence(1, 1, 3, 2, "the-");
-    a.insert_sentence(1, 1, 1, 3, "the:");
+    a.insert_sentence(1, 1, 1, 2, "the?");
+    a.insert_sentence(1, 1, 1, 3, "the,");
+    a.insert_sentence(1, 1, 1, 4, "the.");
+    a.insert_sentence(1, 1, 1, 5, "the!");
+    a.insert_sentence(1, 1, 2, 1, "the-");
+    a.insert_sentence(1, 1, 2, 2, "the:");
     a.insert_sentence(1, 1, 2, 3, "the;");
-    a.insert_sentence(1, 1, 3, 3, "the[");
-    a.insert_sentence(1, 1, 1, 4, "the]");
-    a.insert_sentence(1, 1, 2, 4, "fuck(");
-    a.insert_sentence(1, 1, 3, 4, "fuck)");
-    a.insert_sentence(1, 1, 1, 5, "fuck");
-    a.insert_sentence(1, 1, 2, 5, "fuck");
-    a.insert_sentence(1, 1, 3, 6, "fuck@");
-    a.insert_sentence(1, 1, 1, 6, "is");
-    a.insert_sentence(1, 1, 2, 7, "is");
-    a.insert_sentence(1, 1, 3, 7, "is");
-    a.insert_sentence(1, 1, 1, 7, "is");
-    a.insert_sentence(1, 1, 2, 8, "is");
+    a.insert_sentence(1, 1, 2, 4, "the[");
+    a.insert_sentence(1, 1, 2, 5, "the]");
+    a.insert_sentence(1, 1, 3, 1, "fuck(");
+    a.insert_sentence(1, 1, 3, 2, "fuck)");
+    a.insert_sentence(1, 1, 3, 3, "fuck");
+    a.insert_sentence(1, 1, 3, 4, "fuck");
+    a.insert_sentence(1, 1, 3, 5, "fuck@");
+    a.insert_sentence(1, 1, 4, 6, "is");
+    a.insert_sentence(1, 1, 4, 7, "is");
+    a.insert_sentence(1, 1, 4, 8, "is");
+    a.insert_sentence(1, 1, 4, 9, "is");
+    a.insert_sentence(1, 1, 4, 0, "is");
 
     string q = "the fuck is your name?";
 
     auto ww = a.score_words(q);
-    auto w1 = a.built_over_other_build_struct(ww);
-    // for (int i = 0; i < ww.size(); i++)
-    // {
-    //     cout << ww[i].first << " " << ww[i].second << endl;
-    // }
+    for (int i = 0; i < ww.size(); i++)
+    {
+        cout << ww[i].first << " " << ww[i].second << endl;
+    }
+
+    auto pp = a.score_paragraphs(ww);
+    for (auto p : pp)
+    {
+        cout << p.book_no << " " << p.page_no << " " << p.para_no << " " << p.score << endl;
+    }
+
     cout << "done" << endl;
+
 }
