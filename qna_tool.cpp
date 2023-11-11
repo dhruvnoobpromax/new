@@ -63,10 +63,10 @@ void QNA_tool::insert_sentence(int book_code, int page_no, int paragraph, int se
         {
             new_pages[i] = library[book_code].books[i];
         }
+        library[book_code].size = k+1;
 
         delete[] library[book_code].books;
         library[book_code].books = new_pages;
-        library[book_code].size = 2 * page_no;
         library[book_code].capacity = 2 * page_no;
     }
 
@@ -81,9 +81,9 @@ void QNA_tool::insert_sentence(int book_code, int page_no, int paragraph, int se
     return;
 }
 
-vector<pair<string, int>> QNA_tool::score_words(string question) {
+vector<pair<string, double>> QNA_tool::score_words(string question) {
     
-    vector<pair<string, int>> result;
+    vector<pair<string, double>> result;
     
     string word = "";
 
@@ -158,7 +158,7 @@ vector<pair<string, int>> QNA_tool::score_words(string question) {
             if (word1 == result[i].first)
             {                
                 double c = (result[i].second)/(double)(stod(countofword));
-                result[i].second = c;
+                result[i].second = 3135468;
                 break;
             }   
         }
@@ -314,7 +314,11 @@ int main()
     a.insert_sentence(1, 1, 1, 2, "the, ");
     a.insert_sentence(1, 1, 1, 3, "the!");
 
-    a.score_words("the fuck is your name ?");
+    vector<pair<string, double>> result = a.score_words("the fuck is your name ?");
+
+    for (pair<string, int> i : result) {
+        cout << i.first << " " << i.second << endl;
+    }
 
     cout << "done" << endl;
 }
