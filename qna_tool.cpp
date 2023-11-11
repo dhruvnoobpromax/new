@@ -82,9 +82,9 @@ void QNA_tool::insert_sentence(int book_code, int page_no, int paragraph, int se
     return;
 }
 
-vector<pair<string, int>> QNA_tool::score_words(string question) {
+vector<pair<string, double>> QNA_tool::score_words(string question) {
     
-    vector<pair<string, int>> result;
+    vector<pair<string, double>> result;
     
     string word = "";
 
@@ -161,7 +161,9 @@ vector<pair<string, int>> QNA_tool::score_words(string question) {
                 //cout << result[i].second << endl;
                 
                 double c = (result[i].second)/(double)(stod(countofword));
+                
                 result[i].second = c;
+                cout << result[i].first << " " <<  result[i].second << endl;
                 break;
             }
             
@@ -313,8 +315,19 @@ void QNA_tool::query_llm(string filename, Node *root, int k, string API_KEY, str
 int main()
 {
     QNA_tool a;
-    a.insert_sentence(1, 1, 1, 1, "Ji, ");
-    a.insert_sentence(1, 1, 1, 2, "Hello, ");
-    a.insert_sentence(1, 1, 1, 3, "World!");
+    a.insert_sentence(1, 1, 1, 1, "the ");
+    a.insert_sentence(1, 1, 1, 2, "the?");
+    a.insert_sentence(1, 1, 1, 3, "the,");
+
+    string q = "the fuck is your name?";
+
+    auto ww = a.score_words(q);
+    for (int i = 0; i < ww.size(); i++)
+    {
+        cout << ww[i].first << " " << ww[i].second << endl;
+    }
+    
+
+
     cout << "done" << endl;
 }
