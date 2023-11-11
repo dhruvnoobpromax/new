@@ -255,7 +255,7 @@ Node *QNA_tool::get_top_k_para(string question, int k)
     }
 
     int n = scored_paragraphs.size();
-    for (int i = n-k-1; i < n; i++) {
+    for (int i = n-k; i < n; i++) {
 
         Node* newnode = new Node;
         newnode->left = temp;
@@ -265,10 +265,15 @@ Node *QNA_tool::get_top_k_para(string question, int k)
         newnode->paragraph = scored_paragraphs[i].para_no;
         newnode->sentence_no = -1;
         temp->right = newnode;
+        temp = temp->right;
 
     }
 
-    return root;
+    Node* temp1 = root->right;
+    root->right = nullptr;
+    delete root;
+    
+    return temp1;
 }
 
 void QNA_tool::query(string question, string filename)
@@ -404,7 +409,7 @@ void QNA_tool::query_llm(string filename, Node *root, int k, string API_KEY, str
     system(command.c_str());
     return;
 }
-
+/*
 int main()
 {
     QNA_tool a;
@@ -430,7 +435,7 @@ int main()
     a.insert_sentence(1, 1, 4, 0, "is");
     a.insert_sentence(1, 1, 5, 1, "this");
 
-    // string q = "the fuck is your name?";
+    string q = "the fuck is your name?";
 
     // auto ww = a.score_words(q);
     // for (int i = 0; i < ww.size(); i++)
@@ -444,15 +449,31 @@ int main()
     //     cout << p.book_no << " " << p.page_no << " " << p.para_no << " " << p.score << endl;
     // }
 
-    Node* list = a.get_top_k_para("the fuck", 2);
+    Node* list = a.get_top_k_para("the fuck", 4);
 
     Node* temp = list;
 
-    while (temp->right != nullptr) {
+    while (temp != nullptr) {
         cout << temp->book_code << " " << temp->page << " " << temp->paragraph << endl;
         temp = temp->right;
     }
 
     cout << "done" << endl;
 
-}
+    // QNA_tool wasted;
+    // vector<QNA_tool::paragraph_details> ass;
+    // for (int i = 0; i < 11; i++)
+    // {
+    //     QNA_tool::paragraph_details tits;
+    //     tits.book_no = 1;
+    //     tits.page_no = 1;
+    //     tits.para_no = i+1;
+    //     tits.score = i+1;
+
+    //     ass.push_back(tits);
+    // }
+    
+    // wasted.heapSort(ass,10);
+    // cout << "done";
+
+}*/
