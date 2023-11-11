@@ -24,12 +24,14 @@ QNA_tool::my_ds1::~my_ds1()
 
 QNA_tool::my_ds2::my_ds2()
 {
-    book = new vector<my_ds1>[1024];
+    books = new vector<my_ds1>[1024];
+    capacity = 1024;
+    size = 0;
 }
 
 QNA_tool::my_ds2::~my_ds2()
 {
-    delete[] book;
+    delete[] books;
 }
 
 QNA_tool::QNA_tool()
@@ -43,7 +45,7 @@ QNA_tool::~QNA_tool()
     // Implement your function here
 }
 
-void QNA_tool::insert_sentence(int book_code, int page, int paragraph, int sentence_no, string sentence)
+void QNA_tool::insert_sentence(int book_code, int page_no, int paragraph, int sentence_no, string sentence)
 {
 
     if (library.size() < book_code)
@@ -51,27 +53,31 @@ void QNA_tool::insert_sentence(int book_code, int page, int paragraph, int sente
         library.resize(2 * book_code);
     }
 
-    if (library[book_code].book->size() <= page)
+    if (library[book_code].capacity <= page_no)
     {
-        int k = library[book_code].book->size();
+        int k = library[book_code].capacity;
 
-        vector<my_ds1> *new_pages = new vector<my_ds1>[2 * page];
+        vector<my_ds1> *new_pages = new vector<my_ds1>[2 * page_no];
 
         for (int i = 0; i < k; i++)
         {
-            new_pages[i] = library[book_code].book[i];
+            new_pages[i] = library[book_code].books[i];
         }
 
-        delete[] library[book_code].book;
-        library[book_code].book = new_pages;
+        delete[] library[book_code].books;
+        library[book_code].books = new_pages;
+        library[book_code].size = 2 * page_no;
+        library[book_code].capacity = 2 * page_no;
     }
 
-    if (library[book_code].book[page].size() < paragraph)
+
+    if (library[book_code].books[page_no].size() < paragraph)
     {
-        library[book_code].book[page].resize(2 * paragraph);
+        library[book_code].books[page_no].resize(2 * paragraph);
     }
 
-    library[book_code].book[page][paragraph].dictionary.insert_sentence(book_code, page, paragraph, sentence_no, sentence);
+    library[book_code].books[page_no][paragraph].dictionary.insert_sentence(book_code, page_no, paragraph, sentence_no, sentence);
+    library[book_code].size++;
 
     return;
 }
@@ -119,10 +125,10 @@ vector<pair<string, int>> QNA_tool::score_words(string question) {
     
 
     for (int i = 0; i<library.size(); i++) {
-        for (int j = 0; j<library[i].book->size(); j++) {
-            for (int k = 0; k<library[i].book[j].size(); k++) {
+        for (int j = 0; j<library[i].size; j++) {
+            for (int k = 0; k<library[i].books[j].size(); k++) {
                 
-                Dict dictionary = library[i].book[j][k].dictionary;
+                Dict dictionary = library[i].books[j][k].dictionary;
                 
                 for (int l = 0; l<result.size(); l++) {
                     result[l].second += dictionary.get_word_count(result[l].first);
@@ -134,8 +140,9 @@ vector<pair<string, int>> QNA_tool::score_words(string question) {
 
     int find_count = 0;
     ifstream frequency_file("unigram.csv");
+
     while (find_count < result.size()) {
-        
+            
     }
 
     return result;
@@ -156,10 +163,10 @@ void QNA_tool::query(string question, string filename)
     return;
 }
 
-std::string QNA_tool::get_paragraph(int book_code, int page, int paragraph)
+std::string QNA_tool::get_paragraph(int book_code, int books, int paragraph)
 {
 
-    cout << "Book_code: " << book_code << " Page: " << page << " Paragraph: " << paragraph << endl;
+    cout << "Book_code: " << book_code << " Page: " << books << " Paragraph: " << paragraph << endl;
 
     std::string filename = "mahatma-gandhi-collected-works-volume-";
     filename += to_string(book_code);
@@ -222,7 +229,7 @@ std::string QNA_tool::get_paragraph(int book_code, int page, int paragraph)
 
         if (
             (metadata[0] == book_code) &&
-            (metadata[1] == page) &&
+            (metadata[1] == books) &&
             (metadata[2] == paragraph))
         {
             res += sentence;
@@ -250,7 +257,7 @@ void QNA_tool::query_llm(string filename, Node *root, int k, string API_KEY, str
         // delete the file if it exists
         remove(p_file.c_str());
         ofstream outfile(p_file);
-        string paragraph = get_paragraph(traverse->book_code, traverse->page, traverse->paragraph);
+        string paragraph = get_paragraph(traverse->book_code, traverse->books, traverse->paragraph);
         assert(paragraph != "$I$N$V$A$L$I$D$");
         outfile << paragraph;
         outfile.close();

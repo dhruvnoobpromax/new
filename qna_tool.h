@@ -71,7 +71,8 @@ public:
         /* data */
     public:
 
-        vector<my_ds1>* book;
+        int size, capacity;
+        vector<my_ds1>* books;
         my_ds2(/* args */);
         ~my_ds2();
     };
