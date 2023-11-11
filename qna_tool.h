@@ -22,23 +22,6 @@ private:
     // You can add attributes/helper functions here
 
 public:
-    class line
-    {
-    private:
-        /* data */
-    public:
-        int book_code;
-        int page;
-        int paragraph;
-        int sentence_no;
-        
-        string sentence;
-        line(int bcode,int pg,int para, int sentno, string s);
-        //~line();
-    };
-    
-    vector<vector<vector<vector<line>>>> a;
-    
     /* Please do not touch the attributes and
     functions within the guard lines placed below  */
     /* ------------------------------------------- */
@@ -67,5 +50,34 @@ public:
     /* -----------------------------------------*/
     /* Please do not touch the code above this line */
 
-    // You can add attributes/helper functions here
+    class my_ds1
+    {
+    private:
+        /* data */
+    public:
+        Dict dictionary;
+        int score = 0;
+        int b_no;
+        int p_no;
+        int para_no;
+        my_ds1();
+        my_ds1(int b, int p, int para);
+        ~my_ds1();
+    };
+
+    class my_ds2
+    {
+    private:
+        /* data */
+    public:
+
+        vector<my_ds1>* book;
+        my_ds2(/* args */);
+        ~my_ds2();
+    };
+    
+    vector<my_ds2> library;
+    
+    vector<pair<string, int>> score_words(string question);    
+
 };
