@@ -79,6 +79,14 @@ public:
     
     vector<my_ds2> library;
     
-    vector<pair<string, double>> score_words(string question);    
+    vector<pair<string, double>> score_words(string question);
+
+    struct paragraph_details {
+        int book_no;
+        int page_no;
+        int para_no;
+    };
+    
+    vector<paragraph_details> score_paragraphs(vector<pair<string, double>> );
 
 };
