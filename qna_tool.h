@@ -81,12 +81,14 @@ public:
     
     vector<pair<string, double>> score_words(string question);
 
-    struct paragraph_details {
+    struct new_user_defined_enhanced_struct {
         int book_no;
         int page_no;
         int para_no;
+
+        double score;
     };
     
-    vector<paragraph_details> score_paragraphs(vector<pair<string, double>> );
+    vector<new_user_defined_enhanced_struct> built_over_other_build_struct(vector<pair<string, double>> );
 
 };

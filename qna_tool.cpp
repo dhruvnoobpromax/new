@@ -48,7 +48,7 @@ QNA_tool::~QNA_tool()
 void QNA_tool::insert_sentence(int book_code, int page_no, int paragraph, int sentence_no, string sentence)
 {
 
-    if (library.size() < book_code)
+    if (library.size() <= book_code)
     {
         library.resize(2 * book_code);
     }
@@ -71,7 +71,7 @@ void QNA_tool::insert_sentence(int book_code, int page_no, int paragraph, int se
 
     library[book_code].size = max(library[book_code].size, page_no);
 
-    if (library[book_code].books[page_no].size() < paragraph)
+    if (library[book_code].books[page_no].size() <= paragraph)
     {
         library[book_code].books[page_no].resize(2 * paragraph);
     }
@@ -165,20 +165,31 @@ vector<pair<string, double>> QNA_tool::score_words(string question) {
     return result;
 }
 
-vector<QNA_tool::paragraph_details> QNA_tool::score_paragraphs(vector<pair<string, double>> query_words) {
+vector<QNA_tool::new_user_defined_enhanced_struct> QNA_tool::built_over_other_build_struct(vector<pair<string, double>> query_words) {
         
-        vector<paragraph_details> result;
+        vector<new_user_defined_enhanced_struct> result;
 
         for (int i = 1; i<library.size(); i++) {
             for (int j = 1; j<=library[i].size; j++) {
                 for (int k = 1; k<library[i].books[j].size(); k++) {
                     
                     Dict dictionary = library[i].books[j][k].dictionary;
+                    double score;
                     
-                    for (int l = 0; l<query_words.size(); l++) {
-                        
+                    for (int l = 0; l<query_words.size(); l++) 
+                    {
+                        int a = dictionary.get_word_count(query_words[l].first);
+                        double b = a*query_words[i].second;
+                        score += b;
                     }
-                    
+
+                    new_user_defined_enhanced_struct tr;
+                    tr.book_no = i;
+                    tr.page_no = j;
+                    tr.para_no = k;
+                    tr.score = score;
+
+                    result.push_back(tr);
                 }
             }
         }
@@ -331,32 +342,33 @@ int main()
 {
     QNA_tool a;
     a.insert_sentence(1, 1, 1, 1, "the ");
-    a.insert_sentence(1, 1, 1, 2, "the?");
-    a.insert_sentence(1, 1, 1, 3, "the,");
-    a.insert_sentence(1, 1, 1, 4, "the.");
-    a.insert_sentence(1, 1, 1, 5, "the!");
-    a.insert_sentence(1, 1, 1, 6, "the-");
-    a.insert_sentence(1, 1, 1, 7, "the:");
-    a.insert_sentence(1, 1, 1, 8, "the;");
-    a.insert_sentence(1, 1, 1, 9, "the[");
-    a.insert_sentence(1, 1, 1, 10, "the]");
-    a.insert_sentence(1, 1, 1, 11, "fuck(");
-    a.insert_sentence(1, 1, 1, 12, "fuck)");
-    a.insert_sentence(1, 1, 1, 13, "fuck");
-    a.insert_sentence(1, 1, 1, 14, "fuck");
-    a.insert_sentence(1, 1, 1, 15, "fuck@");
-    a.insert_sentence(1, 1, 1, 16, "is");
-    a.insert_sentence(1, 1, 1, 17, "is");
-    a.insert_sentence(1, 1, 1, 18, "is");
-    a.insert_sentence(1, 1, 1, 19, "is");
-    a.insert_sentence(1, 1, 1, 20, "is");
+    a.insert_sentence(1, 1, 2, 1, "the?");
+    a.insert_sentence(1, 1, 3, 1, "the,");
+    a.insert_sentence(1, 1, 1, 2, "the.");
+    a.insert_sentence(1, 1, 2, 2, "the!");
+    a.insert_sentence(1, 1, 3, 2, "the-");
+    a.insert_sentence(1, 1, 1, 3, "the:");
+    a.insert_sentence(1, 1, 2, 3, "the;");
+    a.insert_sentence(1, 1, 3, 3, "the[");
+    a.insert_sentence(1, 1, 1, 4, "the]");
+    a.insert_sentence(1, 1, 2, 4, "fuck(");
+    a.insert_sentence(1, 1, 3, 4, "fuck)");
+    a.insert_sentence(1, 1, 1, 5, "fuck");
+    a.insert_sentence(1, 1, 2, 5, "fuck");
+    a.insert_sentence(1, 1, 3, 6, "fuck@");
+    a.insert_sentence(1, 1, 1, 6, "is");
+    a.insert_sentence(1, 1, 2, 7, "is");
+    a.insert_sentence(1, 1, 3, 7, "is");
+    a.insert_sentence(1, 1, 1, 7, "is");
+    a.insert_sentence(1, 1, 2, 8, "is");
 
     string q = "the fuck is your name?";
 
     auto ww = a.score_words(q);
-    for (int i = 0; i < ww.size(); i++)
-    {
-        cout << ww[i].first << " " << ww[i].second << endl;
-    }
+    auto w1 = a.built_over_other_build_struct(ww);
+    // for (int i = 0; i < ww.size(); i++)
+    // {
+    //     cout << ww[i].first << " " << ww[i].second << endl;
+    // }
     cout << "done" << endl;
 }
