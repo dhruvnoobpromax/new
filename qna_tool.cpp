@@ -36,8 +36,7 @@ QNA_tool::my_ds2::~my_ds2()
 
 QNA_tool::QNA_tool()
 {
-    library = vector<my_ds2>();
-    library.reserve(128);
+    library = vector<my_ds2>(128);
 }
 
 QNA_tool::~QNA_tool()
@@ -73,7 +72,7 @@ void QNA_tool::insert_sentence(int book_code, int page_no, int paragraph, int se
 
     if (library[book_code].books[page_no].size() <= paragraph)
     {
-        library[book_code].books[page_no].resize(2 * paragraph);
+        library[book_code].books[page_no].resize(2 * paragraph + 1);
     }
 
     library[book_code].books[page_no][paragraph].dictionary.insert_sentence(book_code, page_no, paragraph, sentence_no, sentence);
@@ -124,8 +123,8 @@ vector<pair<string, double>> QNA_tool::score_words(string question) {
     
 
     for (int i = 1; i<library.size(); i++) {
-        for (int j = 1; j<=library[i].size; j++) {
-            for (int k = 1; k<library[i].books[j].size(); k++) {
+        for (int j = 0; j<=library[i].size; j++) {
+            for (int k = 0; k<library[i].books[j].size(); k++) {
                 
                 Dict dictionary = library[i].books[j][k].dictionary;
                 
@@ -477,3 +476,12 @@ int main()
     // cout << "done";
 
 }*/
+
+// int main()
+// {
+//     QNA_tool a;
+//     a.insert_sentence(1,0,0,1,"this");
+//     //a.insert_sentence(1,0,0,1,"VOL.1: 1884 30 NOVEMBER, 1896 1");
+//     cout << "done";
+// }
+
