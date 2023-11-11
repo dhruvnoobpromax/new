@@ -79,6 +79,6 @@ public:
     
     vector<my_ds2> library;
     
-    vector<pair<string, int>> score_words(string question);    
+    vector<pair<string, double>> score_words(string question);    
 
 };
