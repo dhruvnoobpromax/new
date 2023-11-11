@@ -26,7 +26,7 @@ QNA_tool::my_ds2::my_ds2()
 {
     books = new vector<my_ds1>[1024];
     capacity = 1024;
-    size = 0;
+    size = 1;
 }
 
 QNA_tool::my_ds2::~my_ds2()
@@ -64,13 +64,12 @@ void QNA_tool::insert_sentence(int book_code, int page_no, int paragraph, int se
             new_pages[i] = library[book_code].books[i];
         }
 
-
         delete[] library[book_code].books;
         library[book_code].books = new_pages;
         library[book_code].capacity = 2 * page_no;
-        library[book_code].size = max(library[book_code].size, page_no);
     }
 
+    library[book_code].size = max(library[book_code].size, page_no);
 
     if (library[book_code].books[page_no].size() < paragraph)
     {
@@ -86,8 +85,8 @@ vector<pair<string, double>> QNA_tool::score_words(string question) {
     
     vector<pair<string, double>> result;
     
+    // strip punctuations
     string word = "";
-
     for (int i = 0; i < question.size(); i++) {
         
         char s = question[i];
@@ -124,9 +123,9 @@ vector<pair<string, double>> QNA_tool::score_words(string question) {
     }
     
 
-    for (int i = 0; i<library.size(); i++) {
-        for (int j = 0; j<library[i].size; j++) {
-            for (int k = 0; k<library[i].books[j].size(); k++) {
+    for (int i = 1; i<library.size(); i++) {
+        for (int j = 1; j<=library[i].size; j++) {
+            for (int k = 1; k<library[i].books[j].size(); k++) {
                 
                 Dict dictionary = library[i].books[j][k].dictionary;
                 
@@ -138,15 +137,12 @@ vector<pair<string, double>> QNA_tool::score_words(string question) {
         }
     }
 
-    for (pair<string, int> i : result) {
-        cout << i.first << " " << i.second << endl;
-    }
-
     int find_count = 0;
-    ifstream frequency_file("unigram_freq.csv");
     
     for (int i = 0; i < result.size(); i++)
     {
+        ifstream frequency_file("unigram_freq.csv");
+        
         std::string word1;
         std::string countofword;
 
@@ -157,20 +153,38 @@ vector<pair<string, double>> QNA_tool::score_words(string question) {
             getline(frequency_file,countofword);
 
             if (word1 == result[i].first)
-            {                
-                double c = (result[i].second)/(double)(stod(countofword));
-                
-                result[i].second = c;
-                cout << result[i].first << " " <<  result[i].second << endl;
-
-                result[i].second = 3135468;
-
+            {   
+                result[i].second = (result[i].second)/(double)(stod(countofword));                ;
                 break;
-            }   
+            }
         }
+
+        frequency_file.close();
     }
 
     return result;
+}
+
+vector<QNA_tool::paragraph_details> QNA_tool::score_paragraphs(vector<pair<string, double>> query_words) {
+        
+        vector<paragraph_details> result;
+
+        for (int i = 1; i<library.size(); i++) {
+            for (int j = 1; j<=library[i].size; j++) {
+                for (int k = 1; k<library[i].books[j].size(); k++) {
+                    
+                    Dict dictionary = library[i].books[j][k].dictionary;
+                    
+                    for (int l = 0; l<query_words.size(); l++) {
+                        
+                    }
+                    
+                }
+            }
+        }
+        
+        return result;
+    
 }
 
 Node *QNA_tool::get_top_k_para(string question, int k)
@@ -317,9 +331,25 @@ int main()
 {
     QNA_tool a;
     a.insert_sentence(1, 1, 1, 1, "the ");
-
     a.insert_sentence(1, 1, 1, 2, "the?");
     a.insert_sentence(1, 1, 1, 3, "the,");
+    a.insert_sentence(1, 1, 1, 4, "the.");
+    a.insert_sentence(1, 1, 1, 5, "the!");
+    a.insert_sentence(1, 1, 1, 6, "the-");
+    a.insert_sentence(1, 1, 1, 7, "the:");
+    a.insert_sentence(1, 1, 1, 8, "the;");
+    a.insert_sentence(1, 1, 1, 9, "the[");
+    a.insert_sentence(1, 1, 1, 10, "the]");
+    a.insert_sentence(1, 1, 1, 11, "fuck(");
+    a.insert_sentence(1, 1, 1, 12, "fuck)");
+    a.insert_sentence(1, 1, 1, 13, "fuck");
+    a.insert_sentence(1, 1, 1, 14, "fuck");
+    a.insert_sentence(1, 1, 1, 15, "fuck@");
+    a.insert_sentence(1, 1, 1, 16, "is");
+    a.insert_sentence(1, 1, 1, 17, "is");
+    a.insert_sentence(1, 1, 1, 18, "is");
+    a.insert_sentence(1, 1, 1, 19, "is");
+    a.insert_sentence(1, 1, 1, 20, "is");
 
     string q = "the fuck is your name?";
 
@@ -328,18 +358,5 @@ int main()
     {
         cout << ww[i].first << " " << ww[i].second << endl;
     }
-    
-
-
-    a.insert_sentence(1, 1, 1, 2, "the, ");
-    a.insert_sentence(1, 1, 1, 3, "the!");
-
-    vector<pair<string, double>> result = a.score_words("the fuck is your name ?");
-
-    for (pair<string, int> i : result) {
-        cout << i.first << " " << i.second << endl;
-    }
-
-
     cout << "done" << endl;
 }
