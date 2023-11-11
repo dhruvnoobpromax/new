@@ -63,11 +63,12 @@ void QNA_tool::insert_sentence(int book_code, int page_no, int paragraph, int se
         {
             new_pages[i] = library[book_code].books[i];
         }
-        library[book_code].size = k+1;
+
 
         delete[] library[book_code].books;
         library[book_code].books = new_pages;
         library[book_code].capacity = 2 * page_no;
+        library[book_code].size = max(library[book_code].size, page_no);
     }
 
 
