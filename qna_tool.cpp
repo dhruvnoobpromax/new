@@ -375,6 +375,12 @@ int main()
     {
         cout << ww[i].first << " " << ww[i].second << endl;
     }
+
+    auto pp = a.score_paragraphs(ww);
+    for (auto p : pp)
+    {
+        cout << p.book_no << " " << p.page_no << " " << p.para_no << " " << p.score << endl;
+    }
     
     cout << "done" << endl;
 }
