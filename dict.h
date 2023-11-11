@@ -29,7 +29,7 @@ class Dict {
 
     void insert_sentence(int book_code, int page, int paragraph, int sentence_no, string sentence);
 
-    int get_word_count(string word);
+    unsigned long long get_word_count(string word);
 
     void dump_dictionary(string filename);
 
